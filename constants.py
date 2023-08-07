@@ -4,7 +4,9 @@ import os
 from chromadb.config import Settings
 
 # https://python.langchain.com/en/latest/modules/indexes/document_loaders/examples/excel.html?highlight=xlsx#microsoft-excel
-from langchain.document_loaders import CSVLoader, PDFMinerLoader, TextLoader, UnstructuredExcelLoader, Docx2txtLoader
+from langchain.document_loaders import CSVLoader, PDFMinerLoader, TextLoader, UnstructuredExcelLoader, Docx2txtLoader,UnstructuredHTMLLoader,BSHTMLLoader
+
+# from bs4 import BeautifulSoup
 
 # load_dotenv()
 ROOT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
@@ -21,6 +23,13 @@ INGEST_THREADS = os.cpu_count() or 8
 CHROMA_SETTINGS = Settings(
     chroma_db_impl="duckdb+parquet", persist_directory=PERSIST_DIRECTORY, anonymized_telemetry=False
 )
+# class HTMLLoader:
+#     def __init__(self, file_path):
+#         with open(file_path, 'r') as f:
+#             self.soup = BeautifulSoup(f, 'html.parser')
+
+#     def get_text(self):
+#         return self.soup.get_text()
 
 # https://python.langchain.com/en/latest/_modules/langchain/document_loaders/excel.html#UnstructuredExcelLoader
 DOCUMENT_MAP = {
@@ -30,10 +39,12 @@ DOCUMENT_MAP = {
     ".pdf": PDFMinerLoader,
     ".csv": CSVLoader,
     ".xls": UnstructuredExcelLoader,
-    ".xlxs": UnstructuredExcelLoader,
+    ".xlsx": UnstructuredExcelLoader,
     ".docx": Docx2txtLoader,
     ".doc": Docx2txtLoader,
+    ".html": UnstructuredHTMLLoader,
 }
+
 
 # Default Instructor Model
 EMBEDDING_MODEL_NAME = "hkunlp/instructor-large"

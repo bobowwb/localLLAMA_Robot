@@ -2,7 +2,11 @@ import logging
 import os
 import shutil
 import subprocess
-
+# The model 'LlamaGPTQForCausalLM' is not supported for text-generation. Supported models are 
+# ['BartForCausalLM', 'BertLMHeadModel', 'BertGenerationDecoder', 'BigBirdForCausalLM', 'BigBirdPegasusForCausalLM', 
+# 'BioGptForCausalLM', 'BlenderbotForCausalLM', 'BlenderbotSmallForCausalLM', 'BloomForCausalLM', 'CamembertForCausalLM', 'CodeGenForCausalLM', 'CpmAntForCausalLM', 'CTRLLMHeadModel', 'Data2VecTextForCausalLM', 'ElectraForCausalLM', 'ErnieForCausalLM', 'FalconForCausalLM', 'GitForCausalLM', 
+# 'GPT2LMHeadModel', 'GPT2LMHeadModel', 'GPTBigCodeForCausalLM', 'GPTNeoForCausalLM', 'GPTNeoXForCausalLM', 'GPTNeoXJapaneseForCausalLM', 
+# 'GPTJForCausalLM', 'LlamaForCausalLM', 'MarianForCausalLM', 'MBartForCausalLM', 'MegaForCausalLM', 'MegatronBertForCausalLM', 'MusicgenForCausalLM', 'MvpForCausalLM', 'OpenLlamaForCausalLM', 'OpenAIGPTLMHeadModel', 'OPTForCausalLM', 'PegasusForCausalLM', 'PLBartForCausalLM', 'ProphetNetForCausalLM', 'QDQBertLMHeadModel', 'ReformerModelWithLMHead', 'RemBertForCausalLM', 'RobertaForCausalLM', 'RobertaPreLayerNormForCausalLM', 'RoCBertForCausalLM', 'RoFormerForCausalLM', 'RwkvForCausalLM', 'Speech2Text2ForCausalLM', 'TransfoXLLMHeadModel', 'TrOCRForCausalLM', 'XGLMForCausalLM', 'XLMWithLMHeadModel', 'XLMProphetNetForCausalLM', 'XLMRobertaForCausalLM', 'XLMRobertaXLForCausalLM', 'XLNetLMHeadModel', 'XmodForCausalLM'].
 import torch
 from auto_gptq import AutoGPTQForCausalLM
 from flask import Flask, jsonify, request
@@ -25,6 +29,9 @@ from transformers import (
 from werkzeug.utils import secure_filename
 
 from constants import CHROMA_SETTINGS, EMBEDDING_MODEL_NAME, PERSIST_DIRECTORY
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+
 
 DEVICE_TYPE = "cuda"
 SHOW_SOURCES = True
@@ -100,6 +107,7 @@ def load_model(device_type, model_id, model_basename=None):
         logging.info("Tokenizer loaded")
 
         model = AutoGPTQForCausalLM.from_quantized(
+        # model = LlamaForCausalLM.from_quantized(
             model_id,
             model_basename=model_basename,
             use_safetensors=True,
@@ -241,10 +249,14 @@ def run_ingest_route():
         return f"Error occurred: {str(e)}", 500
 
 
+
+app = Flask(__name__)
+CORS(app)
 @app.route("/api/prompt_route", methods=["GET", "POST"])
 def prompt_route():
     global QA
-    user_prompt = request.form.get("user_prompt")
+    # user_prompt = request.form.get("user_prompt")
+    user_prompt = request.get_json().get("user_prompt");
     if user_prompt:
         # print(f'User Prompt: {user_prompt}')
         # Get the answer from the chain

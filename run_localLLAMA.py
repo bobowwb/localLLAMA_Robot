@@ -47,7 +47,8 @@ def load_model(device_type, model_id, model_basename=None):
         if ".ggml" in model_basename:
             logging.info("Using Llamacpp for GGML quantized models")
             model_path = hf_hub_download(repo_id=model_id, filename=model_basename)
-            max_ctx_size = 2048
+            # max_ctx_size = 2048
+            max_ctx_size = 4096
             kwargs = {
                 "model_path": model_path,
                 "n_ctx": max_ctx_size,
@@ -169,7 +170,9 @@ def main(device_type, show_sources):
 
 
     1. Loads an embedding model, can be HuggingFaceInstructEmbeddings or HuggingFaceEmbeddings
-    2. Loads the existing vectorestore that was created by inget.py
+    numerical representation of piece of information(text,docs,images,audio,etc)
+    https://huggingface.co/blog/getting-started-with-embeddings
+    2. Loads the existing vectorestore that was created by ingest.py
     3. Loads the local LLM using load_model function - You can now set different LLMs.
     4. Setup the Question Answer retreival chain.
     5. Question answers.
@@ -202,7 +205,7 @@ def main(device_type, show_sources):
     # alongside will 100% create OOM on 24GB cards.
     # llm = load_model(device_type, model_id=model_id)
 
-    # for GPTQ (quantized) models
+    # for GPTQ (quantized) models gpu
     # model_id = "TheBloke/Nous-Hermes-13B-GPTQ"
     # model_basename = "nous-hermes-13b-GPTQ-4bit-128g.no-act.order"
     # model_id = "TheBloke/WizardLM-30B-Uncensored-GPTQ"
@@ -256,3 +259,5 @@ if __name__ == "__main__":
         format="%(asctime)s - %(levelname)s - %(filename)s:%(lineno)s - %(message)s", level=logging.INFO
     )
     main()
+# python run_localGPT.py 
+# python run_localGPT.py --device_type cuda --sourses
